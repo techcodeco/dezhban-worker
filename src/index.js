@@ -1,74 +1,50 @@
-import { redis } from "./config/redis.js";
+import { Redis } from "ioredis";
+import MongoConnect from "./config/mongo.js";
 import RubikaApi from "./core/RubikaApi.js";
-import { handleMessage } from "./handler/handleMessage.js";
 import dotenv from "dotenv";
+import RedisStream from "./config/redisStream.js";
 dotenv.config();
+
 const STREAM_NAME = "rubika:updates";
 const CONSUMER_GROUP = "rubika-group";
 const CONSUMER_NAME = `worker-${process.pid}`;
 const TOKEN = process.env.RUBIKA_TOKEN;
+const MONGO_URI = process.env.MONGO_URI;
+const REDIS_URI = process.env.REDIS_URI;
+
 const bot = new RubikaApi(TOKEN);
-async function main() {
-  console.log(`🚀 Worker ${CONSUMER_NAME} started`);
+let mongoConn = new MongoConnect(MONGO_URI);
 
-  try {
-    await redis.ping();
-    console.log("✅ Redis connected");
-  } catch (error) {
-    console.error("❌ Redis connection failed:", error);
+mongoConn.on("connected", async (conn) => {
+  console.log("mongo database is ready ✅");
+  const redis = new Redis(REDIS_URI, {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    retryStrategy: (times) => {
+      if (times > 10) return null;
+      return Math.min(times * 100, 3000);
+    },
+  });
+  redis.on("connect", () => {
+    console.log("redis database is ready ✅");
+    console.log(`🚀 Worker ${CONSUMER_NAME} started`);
+    let redisStreamer = new RedisStream(
+      redis,
+      STREAM_NAME,
+      CONSUMER_GROUP,
+      CONSUMER_NAME,
+    );
+    redisStreamer.on("data", (update) => {
+      console.log(update);
+      // handling here
+    });
+  });
+  redis.on("error", () => {
+    console.log("redis is not ready error in connection");
     process.exit(1);
-  }
-
-  try {
-    await redis.xgroup("CREATE", STREAM_NAME, CONSUMER_GROUP, "$", "MKSTREAM");
-  } catch (e) {
-    if (!e.message?.includes("BUSYGROUP")) {
-      console.error("Group creation error:", e);
-    }
-  }
-
-  while (true) {
-    try {
-      const results = await redis.xreadgroup(
-        "GROUP",
-        CONSUMER_GROUP,
-        CONSUMER_NAME,
-        "COUNT",
-        10,
-        "BLOCK",
-        0,
-        "STREAMS",
-        STREAM_NAME,
-        ">",
-      );
-
-      if (results) {
-        for (const [, messages] of results) {
-          await Promise.all(
-            messages.map((message) =>
-              handleMessage(bot, STREAM_NAME, CONSUMER_GROUP, message),
-            ),
-          );
-        }
-      }
-    } catch (error) {
-      console.error("❌ Error:", error);
-      await new Promise((r) => setTimeout(r, 1000));
-    }
-  }
-}
-bot.polling();
-bot.on("newMessage", (u) => {
-  console.log("recived update", u.query);
+  });
 });
-
-process.on("SIGINT", () => {
-  redis.quit();
-  process.exit(0);
+mongoConn.on("error", () => {
+  console.log("mongo is not ready error in connection");
+  process.exit(1);
 });
-process.on("SIGTERM", () => {
-  redis.quit();
-  process.exit(0);
-});
-
-main();

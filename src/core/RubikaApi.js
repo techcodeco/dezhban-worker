@@ -4,7 +4,7 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import FormData from "form-data";
 import parseBotMarkdown from "../utils/parseBotMarkdown.js";
-import NewMessageContext from "./contexts/newMessageContext.js";
+import NewMessageContext from "./contexts/NewMessageContext.js";
 axiosRetry(axios, {
   retries: 5,
   retryDelay: (retryCount) => {
