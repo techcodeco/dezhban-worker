@@ -1,4 +1,4 @@
-class NewMessageContext {
+class newMessageContext {
   constructor(update) {
     this.update = update;
   }
@@ -23,9 +23,6 @@ class NewMessageContext {
   get senderId() {
     return this.update.new_message.sender_id;
   }
-  get query() {
-    return this.update.new_message.aux_data?.button_id;
-  }
   get chatId() {
     return this.update.chat_id;
   }
@@ -34,4 +31,4 @@ class NewMessageContext {
   }
 }
 
-export default NewMessageContext;
+export default newMessageContext;
