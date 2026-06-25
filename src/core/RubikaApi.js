@@ -5,6 +5,8 @@ import axiosRetry from "axios-retry";
 import FormData from "form-data";
 import parseBotMarkdown from "../utils/parseBotMarkdown.js";
 import NewMessageContext from "./contexts/NewMessageContext.js";
+import { CacheableMemory } from "cacheable";
+
 axiosRetry(axios, {
   retries: 5,
   retryDelay: (retryCount) => {
@@ -29,12 +31,15 @@ axiosRetry(axios, {
   },
 });
 class RubikaApi extends EventEmitter {
-  constructor(token) {
+  constructor(token, options = {}) {
     super();
     this.token = token;
     this.API = "https://botapi.rubika.ir/v3";
     this.lastUpdateTime = 0;
-    this.data = new Map();
+    this.cache = new CacheableMemory({
+      maxSize: 10000 || options.maxSize,
+      lruSize: 1500 || options.lruSize,
+    });
   }
   async request(method, body) {
     return await axios.post(`${this.API}/${this.token}/${method}`, body);

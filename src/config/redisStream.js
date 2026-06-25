@@ -47,7 +47,10 @@ class RedisStream extends EventEmitter {
                 try {
                   const [id, fields] = message;
                   if (fields[1])
-                    return this.emit("data", JSON.parse(fields[1])?.update);
+                    return this.emit("data", {
+                      data: JSON.parse(fields[1])?.update,
+                      streamId: id,
+                    });
                 } catch (error) {
                   this.emit("error", error);
                 }

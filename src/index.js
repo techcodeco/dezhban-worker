@@ -3,6 +3,7 @@ import MongoConnect from "./config/mongo.js";
 import RubikaApi from "./core/RubikaApi.js";
 import dotenv from "dotenv";
 import RedisStream from "./config/redisStream.js";
+import updateHandler from "./handler/updateHandler.js";
 dotenv.config();
 
 const STREAM_NAME = "rubika:updates";
@@ -13,6 +14,7 @@ const MONGO_URI = process.env.MONGO_URI;
 const REDIS_URI = process.env.REDIS_URI;
 
 const bot = new RubikaApi(TOKEN);
+
 let mongoConn = new MongoConnect(MONGO_URI);
 
 mongoConn.on("connected", async (conn) => {
@@ -34,9 +36,9 @@ mongoConn.on("connected", async (conn) => {
       CONSUMER_GROUP,
       CONSUMER_NAME,
     );
-    redisStreamer.on("data", (update) => {
-      console.log(update);
-      // handling here
+    redisStreamer.on("data", async ({ data, streamId }) => {
+      updateHandler(bot, data);
+      await redis.xack(STREAM_NAME, CONSUMER_GROUP, streamId);
     });
   });
   redis.on("error", () => {
