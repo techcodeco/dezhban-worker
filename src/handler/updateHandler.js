@@ -1,5 +1,4 @@
 const updateHandler = (bot, update) => {
-  console.log(bot);
-  console.log(update);
+  bot.updateHandler(update);
 };
 export default updateHandler;
