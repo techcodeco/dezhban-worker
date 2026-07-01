@@ -41,6 +41,10 @@ mongoConn.on("connected", async (conn) => {
       updateHandler(bot, data);
       await redis.xack(STREAM_NAME, CONSUMER_GROUP, streamId);
     });
+    redisStreamer.on("error", async () => {
+      console.log("redis streamer error try for create goup :", CONSUMER_GROUP);
+      redisStreamer.createGroup();
+    });
     bot.on("newMessage", (update) => newMessage(bot, update));
   });
   redis.on("error", () => {
