@@ -1,33 +1,33 @@
 class NewMessageContext {
   constructor(update) {
-    this.update = update;
+    this.context = update;
   }
   get text() {
-    return this.update.new_message.text;
+    return this.context.new_message.text;
   }
   get messageId() {
-    return this.update.new_message.message_id;
+    return this.context.new_message.message_id;
   }
   get replyTo() {
-    return this.update.new_message.reply_to_message_id;
+    return this.context.new_message.reply_to_message_id;
   }
   get replyTo() {
-    return this.update.new_message.time;
+    return this.context.new_message.time;
   }
   get isEdited() {
-    return this.update.new_message.is_edited;
+    return this.context.new_message.is_edited;
   }
   get senderType() {
-    return this.update.new_message.sender_type;
+    return this.context.new_message.sender_type;
   }
   get senderId() {
-    return this.update.new_message.sender_id;
+    return this.context.new_message.sender_id;
   }
   get chatId() {
-    return this.update.chat_id;
+    return this.context.chat_id;
   }
   get type() {
-    return this.update.type;
+    return this.context.type;
   }
 }
 

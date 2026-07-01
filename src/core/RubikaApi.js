@@ -6,6 +6,7 @@ import FormData from "form-data";
 import parseBotMarkdown from "../utils/parseBotMarkdown.js";
 import NewMessageContext from "./contexts/NewMessageContext.js";
 import { CacheableMemory } from "cacheable";
+import EditMessageContext from "./contexts/EditMessageContext.js";
 
 axiosRetry(axios, {
   retries: 5,
@@ -79,12 +80,13 @@ class RubikaApi extends EventEmitter {
   updateHandler(update) {
     switch (update.type) {
       case "UpdatedMessage":
-        this.emit("updateMessage", update);
+        let editctx = new EditMessageContext(update);
+        this.emit("updateMessage", editctx);
         break;
       case "NewMessage":
-        let ctx = new NewMessageContext(update);
-        this.emit("newMessage", ctx);
-        if (ctx.text.startsWith("/")) this.emit("command", update);
+        let newctx = new NewMessageContext(update);
+        this.emit("newMessage", newctx);
+        if (newctx.text.startsWith("/")) this.emit("command", update);
         if (update.query) {
           update.query = update.query;
           this.emit("query", ctx);
