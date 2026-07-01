@@ -1,3 +1,7 @@
+import getChatTypeByGuid from "../../utils/getChatType.js";
+import isGroup from "../../utils/isGroup.js";
+import isUser from "../../utils/isUser.js";
+
 class NewMessageContext {
   constructor(update) {
     this.context = update;
@@ -16,6 +20,15 @@ class NewMessageContext {
   }
   get isEdited() {
     return this.context.new_message.is_edited;
+  }
+  get chatType() {
+    return getChatTypeByGuid(this.context.chat_id);
+  }
+  get chatIsUser() {
+    return isUser(this.context.chat_id);
+  }
+  get chatIsGroup() {
+    return isGroup(this.context.chat_id);
   }
   get senderType() {
     return this.context.new_message.sender_type;

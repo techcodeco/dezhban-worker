@@ -131,6 +131,39 @@ class RubikaApi extends EventEmitter {
   async sendFile(options) {
     return await this.request("sendFile", options);
   }
+  async sendPoll(options) {
+    return await this.request("sendPoll", options);
+  }
+  async sendLocation(options) {
+    return await this.request("sendLocation", options);
+  }
+  async sendContact(options) {
+    return await this.request("sendContact", options);
+  }
+  async getChat(options) {
+    return await this.request("getChat", options);
+  }
+  async forwardMessage(options) {
+    return await this.request("forwardMessage", options);
+  }
+  async editMessageText(options) {
+    return await this.request("editMessageText", options);
+  }
+  async editMessageKeypad(options) {
+    return await this.request("editMessageKeypad", options);
+  }
+  async deleteMessage(options) {
+    return await this.request("deleteMessage", options);
+  }
+  async banChatMember(options) {
+    return await this.request("banChatMember", options);
+  }
+  async unbanChatMember(options) {
+    return await this.request("unbanChatMember", options);
+  }
+  async getMe() {
+    return await this.request("getMe");
+  }
 }
 
 export default RubikaApi;

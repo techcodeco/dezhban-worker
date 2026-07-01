@@ -1,4 +1,5 @@
 export const newMessage = async (bot, update) => {
+  console.log(update);
   bot.cache.set(`${update.chatId}:${update.mesageId}`, {
     text: update.text,
     senderId: update.senderId,
