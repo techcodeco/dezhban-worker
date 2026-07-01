@@ -7,6 +7,7 @@ import parseBotMarkdown from "../utils/parseBotMarkdown.js";
 import NewMessageContext from "./contexts/NewMessageContext.js";
 import { CacheableMemory } from "cacheable";
 import EditMessageContext from "./contexts/EditMessageContext.js";
+import RemoveMessageContext from "./contexts/RemoveMessageContext.js";
 
 axiosRetry(axios, {
   retries: 5,
@@ -93,7 +94,8 @@ class RubikaApi extends EventEmitter {
         }
         break;
       case "RemovedMessage":
-        this.emit("removeMessage", update);
+        let removedCtx = new RemoveMessageContext(update);
+        this.emit("removeMessage", removedCtx);
         break;
       case "StartedBot":
         this.emit("start", update);

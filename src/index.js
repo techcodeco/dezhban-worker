@@ -4,7 +4,7 @@ import RubikaApi from "./core/RubikaApi.js";
 import dotenv from "dotenv";
 import RedisStream from "./config/redisStream.js";
 import updateHandler from "./handler/updateHandler.js";
-import { newMessage } from "./events/events.js";
+import { editMessage, newMessage, removeMessage } from "./events/events.js";
 dotenv.config();
 
 const STREAM_NAME = "rubika:updates";
@@ -46,6 +46,8 @@ mongoConn.on("connected", async (conn) => {
       redisStreamer.createGroup();
     });
     bot.on("newMessage", (update) => newMessage(bot, update));
+    bot.on("updateMessage", (update) => editMessage(bot, update));
+    bot.on("removeMessage", (update) => removeMessage(bot, update));
   });
   redis.on("error", () => {
     console.log("redis is not ready error in connection");
