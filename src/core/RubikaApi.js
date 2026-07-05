@@ -44,13 +44,17 @@ class RubikaApi extends EventEmitter {
     });
   }
   async request(method, body) {
-    return await axios.post(`${this.API}/${this.token}/${method}`, body);
+    let { data } = await axios.post(
+      `${this.API}/${this.token}/${method}`,
+      body,
+    );
+    return data;
   }
   async polling() {
     let offset_id;
     while (true) {
       try {
-        let { data } = await this.request("getUpdates", { offset_id });
+        let data = await this.request("getUpdates", { offset_id });
         if (data.status == "OK") {
           offset_id = data.data.next_offset_id;
           for (const update of data.data.updates) {

@@ -1,3 +1,3 @@
 export default (chatId = "") => {
-  return chatId.startsWith("g0");
+  return chatId.startsWith("b0");
 };

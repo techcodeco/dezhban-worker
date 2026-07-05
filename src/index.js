@@ -12,6 +12,7 @@ const CONSUMER_GROUP = "rubika-group";
 const CONSUMER_NAME = `worker-${process.pid}`;
 const TOKEN = process.env.RUBIKA_TOKEN;
 const MONGO_URI = process.env.MONGO_URI;
+const NODE_ENV = process.env.NODE_ENV;
 const REDIS_URI = process.env.REDIS_URI;
 
 const bot = new RubikaApi(TOKEN);
@@ -42,13 +43,18 @@ mongoConn.on("connected", async (conn) => {
       await redis.xack(STREAM_NAME, CONSUMER_GROUP, streamId);
     });
     redisStreamer.on("error", async () => {
-      console.log("redis streamer error try for create goup :", CONSUMER_GROUP);
+      console.log(
+        "redis streamer error try for create group :",
+        CONSUMER_GROUP,
+      );
       redisStreamer.createGroup();
     });
     bot.on("newMessage", (update) => newMessage(bot, update));
     bot.on("updateMessage", (update) => editMessage(bot, update));
     bot.on("removeMessage", (update) => removeMessage(bot, update));
-    bot.polling();
+    if (NODE_ENV == "dev") {
+      bot.polling();
+    }
   });
   redis.on("error", () => {
     console.log("redis is not ready error in connection");

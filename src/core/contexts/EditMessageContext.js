@@ -1,4 +1,5 @@
 import getChatTypeByGuid from "../../utils/getChatType.js";
+import isBot from "../../utils/isBot.js";
 import isGroup from "../../utils/isGroup.js";
 import isUser from "../../utils/isUser.js";
 
@@ -26,6 +27,9 @@ class EditMessageContext {
   }
   get chatIsUser() {
     return isUser(this.context.chat_id);
+  }
+  get chatIsBot() {
+    return isBot(this.context.chat_id);
   }
   get chatIsGroup() {
     return isGroup.js(this.context.chat_id);
